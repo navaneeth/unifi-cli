@@ -1,6 +1,7 @@
 package output
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/nkn/unifi-cli/internal/api"
@@ -9,14 +10,18 @@ import (
 
 func PrintClientsTable(clients []api.Client) {
 	table := tablewriter.NewWriter(os.Stdout)
-	table.Append([]string{"MAC", "Name", "IP", "Type", "SSID", "Signal", "Uptime", "RX/TX"})
+
+	// Add header row
+	table.Append([]string{"Name", "IP", "Type", "SSID", "Signal", "Uptime", "RX/TX"})
 
 	for _, client := range clients {
 		rxTx := api.FormatBytes(client.RxBytes) + " / " + api.FormatBytes(client.TxBytes)
 
+		// Combine name and MAC address - MAC shown in parentheses to save space
+		nameWithMAC := fmt.Sprintf("%s (%s)", client.GetDisplayName(), client.MAC)
+
 		row := []string{
-			client.MAC,
-			client.GetDisplayName(),
+			nameWithMAC,
 			client.IP,
 			client.GetConnectionType(),
 			client.GetSSID(),

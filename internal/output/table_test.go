@@ -137,13 +137,12 @@ func TestPrintClientsTable_OutputFormat(t *testing.T) {
 	io.Copy(&buf, r)
 	output := buf.String()
 
-	// Verify table contains expected headers
+	// Verify table contains expected headers and values
 	expectedValues := []string{
-		"MAC",
 		"Name",
 		"IP",
 		"Type",
-		"aa:bb:cc:dd:ee:ff",
+		"aa:bb:cc:dd:ee:ff", // MAC should be in output (in parentheses with name)
 		"TestDevice",
 		"192.168.1.100",
 		"Wired",

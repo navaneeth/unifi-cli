@@ -65,12 +65,16 @@ type Client struct {
 }
 
 // GetDisplayName returns the best available name for the client
+// Fallback order: Name -> Hostname -> OUI (manufacturer) -> MAC
 func (c *Client) GetDisplayName() string {
 	if c.Name != "" {
 		return c.Name
 	}
 	if c.Hostname != "" {
 		return c.Hostname
+	}
+	if c.OUI != "" {
+		return c.OUI
 	}
 	return c.MAC
 }

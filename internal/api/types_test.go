@@ -16,6 +16,7 @@ func TestClient_GetDisplayName(t *testing.T) {
 			client: Client{
 				Name:     "MyDevice",
 				Hostname: "hostname",
+				OUI:      "Sony Interactive Entertainment Inc.",
 				MAC:      "aa:bb:cc:dd:ee:ff",
 			},
 			expected: "MyDevice",
@@ -25,15 +26,27 @@ func TestClient_GetDisplayName(t *testing.T) {
 			client: Client{
 				Name:     "",
 				Hostname: "hostname",
+				OUI:      "Sony Interactive Entertainment Inc.",
 				MAC:      "aa:bb:cc:dd:ee:ff",
 			},
 			expected: "hostname",
+		},
+		{
+			name: "only OUI is set",
+			client: Client{
+				Name:     "",
+				Hostname: "",
+				OUI:      "Sony Interactive Entertainment Inc.",
+				MAC:      "aa:bb:cc:dd:ee:ff",
+			},
+			expected: "Sony Interactive Entertainment Inc.",
 		},
 		{
 			name: "only MAC is set",
 			client: Client{
 				Name:     "",
 				Hostname: "",
+				OUI:      "",
 				MAC:      "aa:bb:cc:dd:ee:ff",
 			},
 			expected: "aa:bb:cc:dd:ee:ff",
