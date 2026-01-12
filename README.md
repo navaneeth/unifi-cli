@@ -5,6 +5,8 @@ A command-line interface for managing Unifi Network devices using the official U
 ## Features
 
 - List connected clients with detailed information
+- **Powerful filtering with SQL WHERE clause syntax**
+- Simple filter flags for common use cases (wired/wireless, AP, blocked)
 - Table and JSON output formats
 - Support for self-signed certificates (insecure mode enabled by default)
 - Configuration via environment variables, config file, or command-line flags
@@ -104,6 +106,103 @@ unifi --config /path/to/config.yaml clients list
 unifi clients list --format json
 ```
 
+## Filtering Clients
+
+The CLI supports powerful filtering capabilities to help you find specific clients.
+
+### Simple Filter Flags
+
+Use convenient flags for common filtering scenarios:
+
+```bash
+# Show only wired clients
+unifi clients list --wired
+
+# Show only wireless clients
+unifi clients list --wireless
+
+# Show only blocked clients
+unifi clients list --blocked
+
+# Filter by Access Point MAC address
+unifi clients list --ap aa:bb:cc:dd:ee:ff
+```
+
+### SQL WHERE Clause Filtering
+
+For advanced filtering, use the `--filter` flag with SQL WHERE clause syntax:
+
+```bash
+# Clients with good signal strength
+unifi clients list --filter "signal >= -65"
+
+# Clients on a specific SSID
+unifi clients list --filter "essid = 'HomeWiFi'"
+
+# Wireless clients with good signal
+unifi clients list --filter "is_wired = 0 AND signal >= -60"
+
+# Clients with SSID containing "Guest"
+unifi clients list --filter "essid LIKE '%Guest%'"
+
+# Clients with signal in a specific range
+unifi clients list --filter "signal BETWEEN -70 AND -50"
+
+# Clients by hostname
+unifi clients list --filter "hostname IN ('iphone', 'ipad', 'macbook')"
+
+# Complex queries with parentheses
+unifi clients list --filter "(essid = 'HomeWiFi' OR essid = 'GuestWiFi') AND signal >= -65"
+```
+
+### Combining Filters
+
+You can combine simple flags with SQL filters:
+
+```bash
+# Wireless clients with good signal
+unifi clients list --wireless --filter "signal >= -65"
+
+# Specific AP with hostname pattern
+unifi clients list --ap aa:bb:cc:dd:ee:ff --filter "hostname LIKE '%phone%'"
+
+# Wired clients only, output as JSON
+unifi clients list --wired --format json
+```
+
+### Available Filter Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `mac` | TEXT | Client MAC address |
+| `name` | TEXT | User-assigned client name |
+| `hostname` | TEXT | Client hostname |
+| `ip` | TEXT | Client IP address |
+| `is_wired` | INTEGER | 1 for wired, 0 for wireless |
+| `blocked` | INTEGER | 1 if blocked, 0 otherwise |
+| `essid` | TEXT | SSID (wireless clients only) |
+| `ap_mac` | TEXT | Access Point MAC address |
+| `signal` | INTEGER | Signal strength in dBm (negative values) |
+| `uptime` | INTEGER | Uptime in seconds |
+| `tx_rate` | INTEGER | Transmission rate in Mbps |
+| `rx_rate` | INTEGER | Receive rate in Mbps |
+| `satisfaction` | INTEGER | Client satisfaction score (0-100) |
+| `channel` | INTEGER | WiFi channel |
+| `rssi` | INTEGER | RSSI value |
+| `sw_mac` | TEXT | Switch MAC address (wired clients) |
+| `sw_port` | INTEGER | Switch port number (wired clients) |
+| `tx_bytes` | INTEGER | Total transmitted bytes |
+| `rx_bytes` | INTEGER | Total received bytes |
+
+### SQL Operators Supported
+
+- Comparison: `=`, `!=`, `>`, `<`, `>=`, `<=`
+- Pattern matching: `LIKE` (use `%` as wildcard)
+- Range: `BETWEEN ... AND ...`
+- Set membership: `IN (...)`
+- Logical: `AND`, `OR`, `NOT`
+- Grouping: `(...)`
+
 ## Getting an API Key
 
 1. Log in to your Unifi Network Application
@@ -152,6 +251,9 @@ unifi-cli/
 │   │   └── types.go
 │   ├── config/       # Configuration management
 │   │   └── config.go
+│   ├── filter/       # Client filtering with SQLite
+│   │   ├── filter.go
+│   │   └── schema.go
 │   └── output/       # Output formatting
 │       ├── table.go
 │       └── json.go
